@@ -1,31 +1,41 @@
-def char_counts(text):
-    char_count_dict = {}
-    for char in text.lower():
-        if char in char_count_dict:
-            char_count_dict[char] += 1
-        else:
-            char_count_dict[char] = 1
-    return char_count_dict
+import sys
+from stats import (
+    get_num_words,
+    chars_dict_to_sorted_list,
+    get_chars_dict,
+)
 
-def word_count(text):
-    return len(text.split())
-
-def word_counting_report(book):
-    formatted_output = f"--- Begin report of {book} ---\n"
-    with open(book) as f:
-        file_contents = f.read()
-        formatted_output += f"{word_count(file_contents)} words found in the document\n\n"
-        char_dict = char_counts(file_contents)
-        for letter in "abcdefghijklmnopqrstuvwxyz":
-            if letter in char_dict:
-                formatted_output += f"The '{letter}' character was found {char_dict[letter]} times\n"
-    formatted_output += "--- End report ---"
-    return formatted_output
 
 def main():
-    print(word_counting_report("books/frankenstein.txt"))
-        # print(word_count(file_contents))
-        # print(char_counts(file_contents))
+    # book_path = "books/frankenstein.txt"
+    if len(sys.argv) < 2:
+        print("Usage: python3 main.py <path_to_book>")
+        sys.exit(1)
+    book_path = sys.argv[1]
+    text = get_book_text(book_path)
+    num_words = get_num_words(text)
+    chars_dict = get_chars_dict(text)
+    chars_sorted_list = chars_dict_to_sorted_list(chars_dict)
+    print_report(book_path, num_words, chars_sorted_list)
 
-if __name__=="__main__":
-    main()
+
+def get_book_text(path):
+    with open(path) as f:
+        return f.read()
+
+
+def print_report(book_path, num_words, chars_sorted_list):
+    print("============ BOOKBOT ============")
+    print(f"Analyzing book found at {book_path}...")
+    print("----------- Word Count ----------")
+    print(f"Found {num_words} total words")
+    print("--------- Character Count -------")
+    for item in chars_sorted_list:
+        if not item["char"].isalpha():
+            continue
+        print(f"{item['char']}: {item['num']}")
+
+    print("============= END ===============")
+
+
+main()
